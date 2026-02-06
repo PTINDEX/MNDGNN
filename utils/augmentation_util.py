@@ -8,22 +8,6 @@ from sklearn.preprocessing import StandardScaler
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class GCN(nn.Module):
-  def __init__(self, in_channels, hidden_channels, out_channels, k):
-    super().__init__()
-    self.conv1 = ChebConv(in_channels, hidden_channels, K=k, normalization='sym')
-    self.conv2 = GCNConv(hidden_channels, out_channels)
-    self.norm = torch.nn.BatchNorm1d(hidden_channels)
-
-  def forward(self, x, edge_indices):
-    x = self.conv1(x, edge_indices)
-    x = self.norm(x)
-    x = F.relu(x)
-    x = F.dropout(x, p=0.5, training=self.training)
-    x = self.conv2(x, edge_indices)
-    return F.log_softmax(x, dim=1)
-
-
 class GraphDataAugmenter:
   def __init__(self, num_classes, hidden_dim=48, k_pseudo=668):
     self.num_classes = num_classes
@@ -84,4 +68,5 @@ class GraphDataAugmenter:
       new_y[pseudo_indices] = pseudo_labels
       aug_data['gene'].y = new_y
     positive_indices = torch.where(pseudo_labels == 1)[0]
+
     return aug_data, positive_indices
