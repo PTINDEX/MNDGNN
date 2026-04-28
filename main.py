@@ -64,7 +64,7 @@ parser.add_argument('--learn_alpha', action='store_true')
 parser.add_argument('--conv_type', type=str, default='mndgcn', help='Convolution type')
 parser.add_argument('--normalize', action='store_true')
 parser.add_argument('--jk', type=str, choices=['max', 'cat', None], default='max', help='Jumping Konwledge')
-parser.add_argument('--beta', type=float, default=0.5, help='Direction convex combination params')
+parser.add_argument('--lam', type=float, default=0.5, help='Direction convex combination params')
 # training params
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
 parser.add_argument('--weight_decay', type=float, default=0.0, help='Weight decay')
@@ -168,7 +168,7 @@ def run(args):
         val_mask=val_mask, 
         test_mask=test_mask, 
         evaluator=None, 
-        beta=args.beta)
+        lam=args.lam)
       
       timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
       early_stopping_callback = EarlyStopping(monitor='val_loss', mode='min', patience=args.patience)
@@ -242,7 +242,7 @@ def run(args):
     val_mask=val_mask,
     test_mask=test_mask,
     evaluator=None,
-    beta=args.beta
+    lam=args.lam
   )
 
   # Prediction
