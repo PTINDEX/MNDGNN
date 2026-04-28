@@ -229,14 +229,14 @@ def get_model(args, mask, deg_enc=None, net_types=6, num_nodes=10013):
 
 
 class LightingFullBatchModelWrapper(pl.LightningModule):
-  def __init__(self, model, lr, weight_decay, train_mask, val_mask, test_mask, evaluator=None, beta=0.5):
+  def __init__(self, model, lr, weight_decay, train_mask, val_mask, test_mask, evaluator=None, lam=0.5):
     super().__init__()
     self.model = model
     self.lr = lr
     self.weight_decay = weight_decay
     self.evaluator = evaluator
     self.train_mask, self.val_mask, self.test_mask = train_mask, val_mask, test_mask
-    self.beta = beta
+    self.lam = lam
   
   def forward(self, x, edge_index, edge_types):
     out, _, _, _, _, _= self.model(x, edge_index, edge_types)
@@ -269,10 +269,10 @@ class LightingFullBatchModelWrapper(pl.LightningModule):
 
     loss_sup = F.nll_loss(out[self.train_mask], y[self.train_mask].squeeze())
     loss_reg = (torch.sum((C_ins - C_ins.mean())**2) + torch.sum((C_outs - C_outs.mean())**2))
-    loss = loss_sup + self.beta * loss_reg
+    loss = loss_sup + self.lam * loss_reg
     self.log('train_loss', loss)
     val_loss = F.nll_loss(out[self.val_mask], y[self.val_mask].squeeze())
-    self.log('val_loss', val_loss + self.beta * loss_reg) 
+    self.log('val_loss', val_loss + self.lam * loss_reg) 
 
     y_pred = torch.exp(out)
     train_acc, train_auc, train_aupr, train_f1, train_mcc = self.evaluate(y_pred=y_pred[self.train_mask], y_true=y[self.train_mask])
