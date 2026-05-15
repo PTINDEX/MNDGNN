@@ -79,4 +79,4 @@ Run python main.py
 ## Citation
 
 If you use this libarary in your work, please cite the paper:
-
+Li P, Xie M (2026) Multiplex networks-based directed graph neural network for cancer driver gene identification. PLOS Computational Biology 22(5): e1014275. https://doi.org/10.1371/journal.pcbi.1014275
